@@ -1,8 +1,8 @@
 import os
 
-from sqlmodel import create_engine, Session, text
+from sqlmodel import create_engine, Session
 
-username = os.getenv("USERNAME")
+username = os.getenv("USER")
 password = os.getenv("PASSWORD")
 server = os.getenv("SERVER_NAME")
 bdd = os.getenv("BDD_NAME")
@@ -13,18 +13,14 @@ DATABASE_URL = (
                 f"{bdd}?driver=ODBC+Driver+18+for+SQL+Server&timeout=60"
 )
 
-
-def create_session(database_url=DATABASE_URL):
-    engine = create_engine(DATABASE_URL)
-    return Session(engine)
+ENGINE = create_engine(DATABASE_URL)
 
 
-
-
-
-engine = create_engine(DATABASE_URL)
-
-with Session(engine) as session:
-    results = session.exec(text("SELECT TOP (10) * FROM [SalesLT].[Product]"))
-    for thing in results:
-        print(thing)
+def get_session():
+    try:
+        with Session(ENGINE) as session:
+            yield session
+    except:
+        raise  
+    finally:
+        pass
